@@ -1,0 +1,495 @@
+<div
+  *ngIf="isOpen()"
+  class="upload-content fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-3 py-6"
+>
+  <div class="upload-content__modal w-full max-w-5xl rounded-xl bg-white shadow-modal">
+    <div class="upload-content__header flex items-start justify-between px-6 pb-3 pt-5">
+      <div>
+        <div class="text-sm font-semibold text-slate-900">Upload Content</div>
+        <div class="mt-1 text-xs text-slate-500">
+          Upload images and videos to your channel library
+        </div>
+      </div>
+      <button
+        type="button"
+        class="upload-content__close -mt-1 inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+        (click)="close()"
+        aria-label="Close"
+      >
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="px-6 pb-6">
+      <div
+        class="upload-content__dropzone relative rounded-lg border border-dashed"
+        [class.upload-content__dropzone--dragging]="isDragging()"
+        [class.upload-content__dropzone--disabled]="isUploading()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <div class="flex flex-col items-center justify-center px-4 py-10 text-center">
+          <div class="upload-content__cloud mb-3 flex h-14 w-14 items-center justify-center rounded-full">
+            <svg viewBox="0 0 24 24" class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path
+                d="M7 18a4 4 0 0 1 0-8 5 5 0 0 1 9.7-1.7A4.5 4.5 0 0 1 18.5 18H7Z"
+              />
+              <path d="M12 12v7" />
+              <path d="m8.5 14.5 3.5-3.5 3.5 3.5" />
+            </svg>
+          </div>
+
+          <div class="text-sm font-semibold text-slate-800">
+            Drop files here or click to browse
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
+            <span class="upload-content__pill">PNG</span>
+            <span class="upload-content__pill">JPEG</span>
+            <span class="upload-content__pill">JPG</span>
+            <span class="upload-content__pill">MP4</span>
+            <span class="upload-content__pill">WEBM</span>
+          </div>
+
+          <button
+            type="button"
+            class="mt-6 inline-flex items-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+            (click)="openBrowse()"
+            [disabled]="isUploading() || maxReached()"
+          >
+            Select files to upload
+          </button>
+
+          <input
+            #fileInput
+            class="hidden"
+            type="file"
+            [attr.accept]="acceptAttribute"
+            [attr.multiple]="true"
+            (change)="onFileInputChange($event)"
+          />
+        </div>
+      </div>
+
+      <div class="mt-4 space-y-2">
+        <div
+          *ngFor="let b of banners()"
+          class="upload-content__banner rounded-md border px-3 py-2 text-xs"
+          [class.upload-content__banner--error]="b.kind === 'error'"
+          [class.upload-content__banner--warning]="b.kind === 'warning'"
+          [class.upload-content__banner--success]="b.kind === 'success'"
+          [class.upload-content__banner--info]="b.kind === 'info'"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="font-semibold">{{ b.title }}</div>
+              <div *ngIf="b.message" class="mt-0.5 text-slate-700">{{ b.message }}</div>
+            </div>
+
+            <div *ngIf="b.actions?.length" class="flex items-center gap-2">
+              <button
+                *ngFor="let a of b.actions"
+                type="button"
+                class="upload-content__bannerAction rounded px-2 py-1 text-[11px] font-semibold"
+                [class.upload-content__bannerAction--primary]="a.variant === 'primary'"
+                [class.upload-content__bannerAction--secondary]="a.variant === 'secondary'"
+                [class.upload-content__bannerAction--ghost]="a.variant === 'ghost'"
+                (click)="onBannerAction(b.id, a.id)"
+              >
+                {{ a.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="upload-content__selectedHeader mt-6 flex items-center justify-between"
+        *ngIf="queue().length > 0"
+      >
+        <div class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+          <span class="inline-flex items-center justify-center rounded-md bg-slate-100 p-1 text-slate-500">
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19V5" />
+              <path d="M4 5h16" />
+              <path d="M4 12h16" />
+              <path d="M4 19h16" />
+            </svg>
+          </span>
+          <span>Selected Files</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="upload-content__toggle flex overflow-hidden rounded-md border border-slate-200 bg-white">
+            <button
+              type="button"
+              class="upload-content__toggleBtn"
+              [class.upload-content__toggleBtn--active]="viewMode() === 'list'"
+              (click)="setViewMode('list')"
+              aria-label="List view"
+            >
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 6h13" />
+                <path d="M8 12h13" />
+                <path d="M8 18h13" />
+                <path d="M3 6h.01" />
+                <path d="M3 12h.01" />
+                <path d="M3 18h.01" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="upload-content__toggleBtn"
+              [class.upload-content__toggleBtn--active]="viewMode() === 'grid'"
+              (click)="setViewMode('grid')"
+              aria-label="Grid view"
+            >
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3h8v8H3z" />
+                <path d="M13 3h8v8h-8z" />
+                <path d="M3 13h8v8H3z" />
+                <path d="M13 13h8v8h-8z" />
+              </svg>
+            </button>
+          </div>
+          <div
+            class="upload-content__count inline-flex h-6 min-w-6 items-center justify-center rounded-md bg-slate-900 px-2 text-xs font-semibold text-white"
+          >
+            {{ queue().length }}
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-content__selected mt-3">
+        <div
+          *ngIf="queue().length === 0"
+          class="upload-content__selectedEmpty rounded-lg border border-slate-100 bg-slate-50 px-4 py-6 text-center text-xs text-slate-500"
+        >
+          No files selected yet.
+        </div>
+
+        <!-- Grid view: compact cards like library tiles -->
+        <div
+          *ngIf="queue().length > 0 && viewMode() === 'grid'"
+          class="upload-content__selectedGrid grid grid-cols-2 gap-3 lg:grid-cols-3"
+        >
+          <div
+            *ngFor="let q of queue()"
+            class="upload-content__fileCard overflow-hidden rounded-xl border bg-white"
+            [class.upload-content__fileCard--duplicate]="q.isDuplicateTitle"
+          >
+            <div class="relative aspect-video bg-slate-100">
+              <video
+                *ngIf="q.isVideo"
+                class="h-full w-full object-cover"
+                [src]="q.objectUrl"
+                muted
+                playsinline
+                loop
+                (mouseenter)="videoEnter(vg)"
+                (mouseleave)="videoLeave(vg)"
+                #vg
+              ></video>
+              <img
+                *ngIf="!q.isVideo"
+                class="h-full w-full object-cover"
+                [src]="q.objectUrl"
+                [alt]="q.filename"
+              />
+
+              <button
+                type="button"
+                class="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-md bg-black/40 text-white shadow-sm"
+                (click)="removeFromQueue(q.id)"
+                [disabled]="q.status === 'uploading'"
+                aria-label="Remove"
+              >
+                <svg viewBox="0 0 24 24" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between px-3 pb-2 pt-2">
+              <div class="min-w-0">
+                <div class="truncate text-[11px] font-semibold text-slate-900">
+                  {{ q.filename }}
+                </div>
+                <div class="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  Image • {{ formatBytes(q.sizeBytes) }}
+                </div>
+              </div>
+              <button
+                type="button"
+                class="ml-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                (click)="beginRename('queue', q.id)"
+                [disabled]="isUploading()"
+                aria-label="More"
+              >
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+            </div>
+
+            <div *ngIf="q.status === 'uploading'" class="px-3 pb-2">
+              <div class="h-1 overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full bg-brand-500" [style.width.%]="q.progressPct"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- List view: detailed cards occupying half width -->
+        <div
+          *ngIf="queue().length > 0 && viewMode() === 'list'"
+          class="upload-content__selectedList grid grid-cols-1 gap-3 md:grid-cols-2"
+        >
+          <div
+            *ngFor="let q of queue()"
+            class="upload-content__fileRow flex items-center gap-3 rounded-lg border bg-white p-3"
+            [class.upload-content__fileRow--duplicate]="q.isDuplicateTitle"
+          >
+            <div class="upload-content__thumbWrapper flex-shrink-0">
+              <div class="upload-content__thumb overflow-hidden rounded-md bg-slate-100">
+              <video
+                *ngIf="q.isVideo"
+                class="h-full w-full object-cover"
+                [src]="q.objectUrl"
+                muted
+                playsinline
+                loop
+                (mouseenter)="videoEnter(v2)"
+                (mouseleave)="videoLeave(v2)"
+                #v2
+              ></video>
+              <img *ngIf="!q.isVideo" class="h-full w-full object-cover" [src]="q.objectUrl" [alt]="q.filename" />
+              </div>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <div class="truncate text-xs font-semibold text-slate-900">{{ q.filename }}</div>
+                <span *ngIf="q.isDuplicateTitle" class="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
+                  Duplicate — click to rename
+                </span>
+              </div>
+              <div class="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                <span class="upload-content__metaChip">Image</span>
+                <span>{{ formatBytes(q.sizeBytes) }}</span>
+                <span>•</span>
+                <span class="truncate">Title: {{ q.title }}</span>
+              </div>
+              <div class="mt-1">
+                <span
+                  class="upload-content__status"
+                  [class.upload-content__status--queued]="q.status === 'queued'"
+                  [class.upload-content__status--uploading]="q.status === 'uploading'"
+                  [class.upload-content__status--uploaded]="q.status === 'uploaded'"
+                  [class.upload-content__status--error]="q.status === 'error'"
+                >
+                  <ng-container [ngSwitch]="q.status">
+                    <span *ngSwitchCase="'queued'">pending</span>
+                    <span *ngSwitchCase="'uploading'">uploading</span>
+                    <span *ngSwitchCase="'uploaded'">uploaded</span>
+                    <span *ngSwitchCase="'error'">error</span>
+                  </ng-container>
+                </span>
+              </div>
+              <div *ngIf="q.status === 'uploading'" class="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full bg-brand-500" [style.width.%]="q.progressPct"></div>
+              </div>
+              <div *ngIf="q.status === 'error'" class="mt-1 text-[11px] font-semibold text-rose-700">
+                {{ q.errorMessage || 'Upload failed' }}
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <button type="button" class="upload-content__iconBtn" (click)="beginRename('queue', q.id)" [disabled]="isUploading()" aria-label="Rename">
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              </button>
+              <button type="button" class="upload-content__iconBtn" (click)="removeFromQueue(q.id)" [disabled]="q.status === 'uploading'" aria-label="Remove">
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        *ngIf="renameTarget()"
+        class="upload-content__rename mt-5 rounded-lg border border-brand-300 bg-brand-50 px-4 py-4"
+      >
+        <div class="upload-content__renameTitle text-[11px] font-semibold uppercase tracking-widest text-brand-800">
+          Rename content
+        </div>
+        <div class="mt-2 flex flex-wrap items-center gap-3">
+          <input
+            class="upload-content__renameInput h-9 w-full min-w-[260px] flex-1 rounded-md border border-rose-300 px-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+            [ngModel]="renameDraft()"
+            (ngModelChange)="renameDraft.set($event)"
+            placeholder="Enter a unique title"
+          />
+          <button
+            type="button"
+            class="upload-content__renameBtn rounded-md bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+            (click)="saveRename()"
+            [disabled]="!renameDraft() || isUploading()"
+          >
+            SAVE
+          </button>
+          <button
+            type="button"
+            class="upload-content__renameBtn rounded-md px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-white"
+            (click)="cancelRename()"
+          >
+            CANCEL
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="library().length" class="mt-7 border-t border-slate-100 pt-6">
+        <div class="flex items-center justify-between">
+          <div class="text-xs font-semibold text-slate-700">Channel Library</div>
+          <div class="text-xs text-slate-500">{{ library().length }} uploaded</div>
+        </div>
+
+        <div *ngIf="viewMode() === 'grid'" class="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div *ngFor="let l of library()" class="upload-content__libCard overflow-hidden rounded-lg border bg-white">
+            <div class="relative aspect-square bg-slate-100">
+              <video
+                *ngIf="l.isVideo"
+                class="h-full w-full object-cover"
+                [src]="l.url"
+                muted
+                playsinline
+                loop
+                (mouseenter)="videoEnter(vl)"
+                (mouseleave)="videoLeave(vl)"
+                #vl
+              ></video>
+              <img *ngIf="!l.isVideo" class="h-full w-full object-cover" [src]="l.url" [alt]="l.filename" />
+
+              <button
+                type="button"
+                class="upload-content__libEdit absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/90 text-slate-600 shadow-sm hover:bg-white"
+                (click)="beginRename('library', l.id)"
+                aria-label="Rename"
+              >
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              </button>
+            </div>
+            <div class="px-3 py-2">
+              <div class="truncate text-xs font-semibold text-slate-900">{{ l.title }}</div>
+              <div class="mt-0.5 truncate text-[11px] text-slate-500">{{ l.filename }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="viewMode() === 'list'" class="mt-3 space-y-2">
+          <div *ngFor="let l of library()" class="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3">
+            <div class="upload-content__thumb overflow-hidden rounded-md bg-slate-100">
+              <video
+                *ngIf="l.isVideo"
+                class="h-12 w-12 object-cover"
+                [src]="l.url"
+                muted
+                playsinline
+                loop
+                (mouseenter)="videoEnter(vll)"
+                (mouseleave)="videoLeave(vll)"
+                #vll
+              ></video>
+              <img *ngIf="!l.isVideo" class="h-12 w-12 object-cover" [src]="l.url" [alt]="l.filename" />
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <div class="truncate text-xs font-semibold text-slate-900">{{ l.title }}</div>
+              <div class="mt-0.5 truncate text-[11px] text-slate-500">{{ l.filename }}</div>
+            </div>
+
+            <button type="button" class="upload-content__iconBtn" (click)="beginRename('library', l.id)" aria-label="Rename">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-7 flex items-center justify-between gap-3">
+        <button
+          type="button"
+          class="rounded-md bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+          (click)="close()"
+        >
+          Close
+        </button>
+
+        <button
+          type="button"
+          class="rounded-md bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+          [disabled]="uploadDisabled()"
+          (click)="uploadAll()"
+        >
+          Upload ({{ queue().length }}) Content
+        </button>
+      </div>
+    </div>
+
+    <div
+      *ngIf="successOpen()"
+      class="upload-content__success fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-3 py-6"
+    >
+      <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-modal">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-sm font-semibold text-slate-900">Uploads complete</div>
+            <div class="mt-1 text-xs text-slate-500">All content uploaded successfully.</div>
+          </div>
+          <button
+            type="button"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            (click)="dismissSuccess()"
+            aria-label="Close"
+          >
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="mt-5 rounded-lg bg-brand-50 px-4 py-4 text-xs text-brand-900">
+          You can close this window or upload more content.
+        </div>
+
+        <div class="mt-6 flex items-center justify-end gap-2">
+          <button
+            type="button"
+            class="rounded-md bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-700"
+            (click)="dismissSuccess()"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
