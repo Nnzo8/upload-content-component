@@ -181,6 +181,7 @@
             *ngFor="let q of queue()"
             class="upload-content__fileCard overflow-hidden rounded-xl border bg-white"
             [class.upload-content__fileCard--duplicate]="q.isDuplicateTitle"
+            [class.upload-content__fileCard--renaming]="renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id"
           >
             <div class="relative aspect-video bg-slate-100">
               <video
@@ -218,10 +219,17 @@
             <div class="flex items-center justify-between px-3 pb-2 pt-2">
               <div class="min-w-0">
                 <div class="truncate text-[11px] font-semibold text-slate-900">
+                  {{
+                    renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id
+                      ? renameDraft()
+                      : q.title
+                  }}
+                </div>
+                <div class="mt-0.5 truncate text-[10px] text-slate-500">
                   {{ q.filename }}
                 </div>
-                <div class="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                  Image • {{ formatBytes(q.sizeBytes) }}
+                <div class="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  {{ q.isVideo ? 'Video' : 'Image' }} • {{ formatBytes(q.sizeBytes) }}
                 </div>
               </div>
               <button
@@ -274,16 +282,23 @@
 
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2">
-                <div class="truncate text-xs font-semibold text-slate-900">{{ q.filename }}</div>
+                <div class="truncate text-xs font-semibold text-slate-900">
+                  {{
+                    renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id
+                      ? renameDraft()
+                      : q.title
+                  }}
+                </div>
                 <span *ngIf="q.isDuplicateTitle" class="rounded bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-800">
                   Duplicate — click to rename
                 </span>
               </div>
-              <div class="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
-                <span class="upload-content__metaChip">Image</span>
+              <div class="mt-0.5 truncate text-[11px] text-slate-500">
+                {{ q.filename }}
+              </div>
+              <div class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                <span class="upload-content__metaChip">{{ q.isVideo ? 'Video' : 'Image' }}</span>
                 <span>{{ formatBytes(q.sizeBytes) }}</span>
-                <span>•</span>
-                <span class="truncate">Title: {{ q.title }}</span>
               </div>
               <div class="mt-1">
                 <span
@@ -307,10 +322,50 @@
               <div *ngIf="q.status === 'error'" class="mt-1 text-[11px] font-semibold text-rose-700">
                 {{ q.errorMessage || 'Upload failed' }}
               </div>
+
+              <!-- List view rename: inline -->
+              <div
+                *ngIf="renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id"
+                class="mt-3 rounded-lg border border-brand-200 bg-brand-50 px-3 py-3"
+              >
+                <div class="text-[11px] font-semibold uppercase tracking-widest text-brand-800">
+                  Rename content
+                </div>
+                <div class="mt-2 flex flex-wrap items-center gap-3">
+                  <input
+                    class="upload-content__renameInput h-9 w-full min-w-[220px] flex-1 rounded-md border border-rose-300 px-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                    [ngModel]="renameDraft()"
+                    (ngModelChange)="renameDraft.set($event)"
+                    placeholder="Enter a unique title"
+                  />
+                  <button
+                    type="button"
+                    class="upload-content__renameBtn rounded-md bg-brand-600 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                    (click)="saveRename()"
+                    [disabled]="!renameDraft() || isUploading()"
+                  >
+                    SAVE
+                  </button>
+                  <button
+                    type="button"
+                    class="upload-content__renameBtn rounded-md px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-white"
+                    (click)="cancelRename()"
+                  >
+                    CANCEL
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="flex items-center gap-1">
-              <button type="button" class="upload-content__iconBtn" (click)="beginRename('queue', q.id)" [disabled]="isUploading()" aria-label="Rename">
+              <button
+                *ngIf="!(renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id)"
+                type="button"
+                class="upload-content__iconBtn"
+                (click)="beginRename('queue', q.id)"
+                [disabled]="isUploading()"
+                aria-label="Rename"
+              >
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 20h9" />
                   <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
@@ -328,8 +383,8 @@
       </div>
 
       <div
-        *ngIf="renameTarget()"
-        class="upload-content__rename mt-5 rounded-lg border border-brand-300 bg-brand-50 px-4 py-4"
+        *ngIf="renameTarget()?.kind === 'queue' && viewMode() === 'grid'"
+        class="upload-content__rename upload-content__rename--grid mt-5 rounded-lg border border-brand-300 bg-brand-50 px-4 py-4"
       >
         <div class="upload-content__renameTitle text-[11px] font-semibold uppercase tracking-widest text-brand-800">
           Rename content
@@ -356,79 +411,6 @@
           >
             CANCEL
           </button>
-        </div>
-      </div>
-
-      <div *ngIf="library().length" class="mt-7 border-t border-slate-100 pt-6">
-        <div class="flex items-center justify-between">
-          <div class="text-xs font-semibold text-slate-700">Channel Library</div>
-          <div class="text-xs text-slate-500">{{ library().length }} uploaded</div>
-        </div>
-
-        <div *ngIf="viewMode() === 'grid'" class="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
-          <div *ngFor="let l of library()" class="upload-content__libCard overflow-hidden rounded-lg border bg-white">
-            <div class="relative aspect-square bg-slate-100">
-              <video
-                *ngIf="l.isVideo"
-                class="h-full w-full object-cover"
-                [src]="l.url"
-                muted
-                playsinline
-                loop
-                (mouseenter)="videoEnter(vl)"
-                (mouseleave)="videoLeave(vl)"
-                #vl
-              ></video>
-              <img *ngIf="!l.isVideo" class="h-full w-full object-cover" [src]="l.url" [alt]="l.filename" />
-
-              <button
-                type="button"
-                class="upload-content__libEdit absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-white/90 text-slate-600 shadow-sm hover:bg-white"
-                (click)="beginRename('library', l.id)"
-                aria-label="Rename"
-              >
-                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                </svg>
-              </button>
-            </div>
-            <div class="px-3 py-2">
-              <div class="truncate text-xs font-semibold text-slate-900">{{ l.title }}</div>
-              <div class="mt-0.5 truncate text-[11px] text-slate-500">{{ l.filename }}</div>
-            </div>
-          </div>
-        </div>
-
-        <div *ngIf="viewMode() === 'list'" class="mt-3 space-y-2">
-          <div *ngFor="let l of library()" class="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3">
-            <div class="upload-content__thumb overflow-hidden rounded-md bg-slate-100">
-              <video
-                *ngIf="l.isVideo"
-                class="h-12 w-12 object-cover"
-                [src]="l.url"
-                muted
-                playsinline
-                loop
-                (mouseenter)="videoEnter(vll)"
-                (mouseleave)="videoLeave(vll)"
-                #vll
-              ></video>
-              <img *ngIf="!l.isVideo" class="h-12 w-12 object-cover" [src]="l.url" [alt]="l.filename" />
-            </div>
-
-            <div class="min-w-0 flex-1">
-              <div class="truncate text-xs font-semibold text-slate-900">{{ l.title }}</div>
-              <div class="mt-0.5 truncate text-[11px] text-slate-500">{{ l.filename }}</div>
-            </div>
-
-            <button type="button" class="upload-content__iconBtn" (click)="beginRename('library', l.id)" aria-label="Rename">
-              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-              </svg>
-            </button>
-          </div>
         </div>
       </div>
 

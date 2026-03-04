@@ -10,10 +10,34 @@
   &__dropzone {
     border-color: rgba(96, 168, 31, 0.55);
     background: linear-gradient(180deg, rgba(243, 251, 235, 0.75), #ffffff 65%);
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease,
+      background 180ms ease;
+    will-change: transform;
+
+    &:hover {
+      border-color: rgba(96, 168, 31, 0.75);
+      box-shadow:
+        0 0 0 4px rgba(96, 168, 31, 0.10),
+        0 18px 45px rgba(15, 23, 42, 0.10);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:hover .upload-content__cloud {
+      transform: translateY(-1px) scale(1.03);
+      background: rgba(96, 168, 31, 0.16);
+    }
 
     &--dragging {
       border-color: rgba(96, 168, 31, 0.95);
       box-shadow: 0 0 0 4px rgba(96, 168, 31, 0.12);
+      transform: scale(1.01);
     }
 
     &--disabled {
@@ -21,12 +45,17 @@
       background: #ffffff;
       opacity: 0.75;
       pointer-events: none;
+      transform: none;
+      box-shadow: none;
     }
   }
 
   &__cloud {
     background: rgba(96, 168, 31, 0.12);
     color: rgba(96, 168, 31, 1);
+    transition:
+      transform 180ms ease,
+      background 180ms ease;
   }
 
   &__pill {
@@ -210,6 +239,56 @@
       background: rgba(254, 242, 242, 1);
       color: rgba(185, 28, 28, 1);
     }
+  }
+
+  &__fileCard {
+    &--renaming {
+      position: relative;
+      border-color: rgba(96, 168, 31, 0.55);
+      box-shadow: 0 0 0 3px rgba(96, 168, 31, 0.10);
+    }
+
+    &--renaming::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -10px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid rgba(96, 168, 31, 0.35);
+      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.02));
+      pointer-events: none;
+    }
+  }
+
+  &__rename {
+    &--grid {
+      position: relative;
+    }
+
+    &--grid::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: -10px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid rgba(96, 168, 31, 0.35);
+      pointer-events: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upload-content__dropzone,
+  .upload-content__cloud {
+    transition: none !important;
   }
 }
 

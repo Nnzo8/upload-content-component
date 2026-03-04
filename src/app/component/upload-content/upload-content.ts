@@ -155,7 +155,7 @@ export class UploadContentComponent implements OnInit, OnDestroy {
   );
 
   protected readonly hasDuplicateTitles = computed(() =>
-    this.queue().some((q) => Boolean(q.isDuplicateTitle))
+    this.queue().some((q) => q.status !== 'uploaded' && Boolean(q.isDuplicateTitle))
   );
 
   protected readonly hasQueuedItems = computed(() => this.queue().length > 0);
@@ -185,7 +185,8 @@ export class UploadContentComponent implements OnInit, OnDestroy {
     }
 
     if (this.hasDuplicateTitles()) {
-      const dupCount = this.queue().filter((q) => q.isDuplicateTitle).length;
+      const dupCount = this.queue().filter((q) => q.status !== 'uploaded' && q.isDuplicateTitle)
+        .length;
       banners.push({
         id: 'duplicate-titles',
         kind: 'warning',
@@ -193,7 +194,9 @@ export class UploadContentComponent implements OnInit, OnDestroy {
         message: `${dupCount} file${dupCount === 1 ? '' : 's'} with duplicate title`
       });
 
-      const firstDup = this.queue().find((q) => q.isDuplicateTitle);
+      const firstDup = this.queue().find(
+        (q) => q.status !== 'uploaded' && q.isDuplicateTitle
+      );
       if (firstDup) {
         banners.push({
           id: 'suggestion-rename',
@@ -565,16 +568,12 @@ export class UploadContentComponent implements OnInit, OnDestroy {
   }
 
   private syncDuplicates(): void {
-    const takenTitles = [
-      ...this.library().map((l) => l.title),
-      ...this.queue().map((q) => q.title)
-    ];
-
-    const titleCounts = new Map<string, number>();
-    for (const t of takenTitles) {
-      const key = uploadContentSanitizeTitle(t).toLowerCase();
+    const activeQueue = this.queue().filter((q) => q.status !== 'uploaded');
+    const queueTitleCounts = new Map<string, number>();
+    for (const q of activeQueue) {
+      const key = uploadContentSanitizeTitle(q.title).toLowerCase();
       if (!key) continue;
-      titleCounts.set(key, (titleCounts.get(key) ?? 0) + 1);
+      queueTitleCounts.set(key, (queueTitleCounts.get(key) ?? 0) + 1);
     }
 
     const libTitlesLower = uploadContentBuildTitlesSetLower(
@@ -585,8 +584,11 @@ export class UploadContentComponent implements OnInit, OnDestroy {
     // within queue OR already exists in the library.
     const queue = this.queue();
     const next = queue.map((q) => {
+      if (q.status === 'uploaded') {
+        return { ...q, isDuplicateTitle: false };
+      }
       const k = uploadContentSanitizeTitle(q.title).toLowerCase();
-      const inQueueDup = (titleCounts.get(k) ?? 0) > 1;
+      const inQueueDup = (queueTitleCounts.get(k) ?? 0) > 1;
       const inLibraryDup = libTitlesLower.has(k);
       return {
         ...q,
@@ -603,7 +605,9 @@ export class UploadContentComponent implements OnInit, OnDestroy {
 
     const taken = [
       ...this.library().map((l) => l.title),
-      ...this.queue().filter((q) => q.id !== queueId).map((q) => q.title)
+      ...this.queue()
+        .filter((q) => q.status !== 'uploaded' && q.id !== queueId)
+        .map((q) => q.title)
     ];
     const takenLower = uploadContentBuildTitlesSetLower(taken);
     return uploadContentMakeSuggestedUniqueTitle(item.title, takenLower);
