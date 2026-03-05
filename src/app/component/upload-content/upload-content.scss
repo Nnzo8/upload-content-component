@@ -2,14 +2,128 @@
   display: contents;
 }
 
+// ─── Color Variables ────────────────────────────────────────────────────────
+$uc-color-brand:         #60a81f;
+$uc-color-brand-dark:    #3a6816;
+$uc-color-brand-50:      #f3fbeb;
+$uc-color-brand-200:     #c6e99b;
+$uc-color-brand-400:     #84c840;
+$uc-color-brand-500:     #60a81f;
+$uc-color-brand-600:     #4e8f18;
+$uc-color-brand-700:     #3a6816;
+
+$uc-color-border:        #e2e8f0;
+
+$uc-color-white:         #ffffff;
+$uc-color-black:         #000000;
+
+$uc-color-slate-50:      #f8fafc;
+$uc-color-slate-100:     #f1f5f9;
+$uc-color-slate-200:     #e2e8f0;
+$uc-color-slate-300:     #cbd5e1;
+$uc-color-slate-400:     #94a3b8;
+$uc-color-slate-500:     #64748b;
+$uc-color-slate-700:     #334155;
+$uc-color-slate-800:     #1e293b;
+$uc-color-slate-900:     #0f172a;
+
+$uc-color-amber:         #f59e0b;
+$uc-color-amber-100:     #fef3c7;
+$uc-color-amber-700:     #b45309;
+$uc-color-amber-800:     #92400e;
+
+$uc-color-blue:          #3b82f6;
+$uc-color-blue-600:      #2563eb;
+$uc-color-blue-50:       #eff6ff;
+
+$uc-color-green:         #22c55e;
+$uc-color-green-50:      #f0fdf4;  // teal-ish: #f0fdfa used for uploaded badge
+$uc-color-green-600:     #16a34a;
+
+$uc-color-rose:          #f87171;
+$uc-color-rose-50:       #fef2f2;
+$uc-color-rose-700:      #b91c1c;
+
+// ─── Spacing / Sizing Variables ─────────────────────────────────────────────
+$uc-radius-sm:   6px;
+$uc-radius-md:   8px;
+$uc-radius-lg:   12px;
+$uc-radius-xl:   16px;
+$uc-radius-full: 9999px;
+
+$uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($uc-color-slate-900, 0.08);
+
+// ─── Base overlay + modal ────────────────────────────────────────────────────
 .upload-content {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 12px;
+  background: rgba($uc-color-black, 0.5);
+
   &__modal {
-    border: 1px solid rgba(226, 232, 240, 0.9);
+    width: 100%;
+    max-width: 80rem; // max-w-7xl
+    border-radius: $uc-radius-xl;
+    background: $uc-color-white;
+    box-shadow: $uc-shadow-modal;
+    border: 1px solid rgba($uc-color-border, 0.9);
   }
 
+  // ─── Header ──────────────────────────────────────────────────────────────
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 24px 12px;
+  }
+
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: $uc-color-slate-900;
+  }
+
+  &__subtitle {
+    margin-top: 4px;
+    font-size: 12px;
+    color: $uc-color-slate-500;
+  }
+
+  &__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-top: -4px;
+    border-radius: $uc-radius-md;
+    color: $uc-color-slate-400;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      background: $uc-color-slate-100;
+      color: $uc-color-slate-700;
+    }
+  }
+
+  // ─── Body ─────────────────────────────────────────────────────────────────
+  &__body {
+    padding: 0 24px 24px;
+  }
+
+  // ─── Dropzone ─────────────────────────────────────────────────────────────
   &__dropzone {
-    border-color: rgba(96, 168, 31, 0.55);
-    background: linear-gradient(180deg, rgba(243, 251, 235, 0.75), #ffffff 65%);
+    position: relative;
+    border-radius: $uc-radius-lg;
+    border: 1px dashed rgba($uc-color-brand, 0.55);
+    background: linear-gradient(180deg, rgba(243, 251, 235, 0.75), $uc-color-white 65%);
+    cursor: pointer;
     transition:
       transform 180ms ease,
       box-shadow 180ms ease,
@@ -18,10 +132,10 @@
     will-change: transform;
 
     &:hover {
-      border-color: rgba(96, 168, 31, 0.75);
+      border-color: rgba($uc-color-brand, 0.75);
       box-shadow:
-        0 0 0 4px rgba(96, 168, 31, 0.10),
-        0 18px 45px rgba(15, 23, 42, 0.10);
+        0 0 0 4px rgba($uc-color-brand, 0.1),
+        0 18px 45px rgba($uc-color-slate-900, 0.10);
       transform: translateY(-1px);
     }
 
@@ -31,18 +145,18 @@
 
     &:hover .upload-content__cloud {
       transform: translateY(-1px) scale(1.03);
-      background: rgba(96, 168, 31, 0.16);
+      background: rgba($uc-color-brand, 0.16);
     }
 
     &--dragging {
-      border-color: rgba(96, 168, 31, 0.95);
-      box-shadow: 0 0 0 4px rgba(96, 168, 31, 0.12);
+      border-color: rgba($uc-color-brand, 0.95);
+      box-shadow: 0 0 0 4px rgba($uc-color-brand, 0.12);
       transform: scale(1.01);
     }
 
     &--disabled {
-      border-color: rgba(148, 163, 184, 0.55);
-      background: #ffffff;
+      border-color: rgba($uc-color-slate-400, 0.55);
+      background: $uc-color-white;
       opacity: 0.75;
       pointer-events: none;
       transform: none;
@@ -50,12 +164,45 @@
     }
   }
 
+  &__dropzoneInner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    text-align: center;
+  }
+
+  &__dropzoneLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: $uc-color-slate-800;
+  }
+
+  // ─── Cloud icon ───────────────────────────────────────────────────────────
   &__cloud {
-    background: rgba(96, 168, 31, 0.12);
-    color: rgba(96, 168, 31, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+    border-radius: $uc-radius-full;
+    background: rgba($uc-color-brand, 0.12);
+    color: $uc-color-brand;
     transition:
       transform 180ms ease,
       background 180ms ease;
+  }
+
+  // ─── Format pills ─────────────────────────────────────────────────────────
+  &__pills {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
   }
 
   &__pill {
@@ -64,101 +211,59 @@
     justify-content: center;
     height: 18px;
     padding: 0 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(96, 168, 31, 0.25);
-    background: rgba(96, 168, 31, 0.08);
+    border-radius: $uc-radius-sm;
+    border: 1px solid rgba($uc-color-brand, 0.25);
+    background: rgba($uc-color-brand, 0.08);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.06em;
-    color: rgba(58, 104, 22, 1);
+    color: $uc-color-brand-dark;
   }
 
-  &__banner {
-    &--error {
-      border-color: rgba(244, 63, 94, 0.35);
-      background: rgba(254, 242, 242, 1);
-    }
-
-    &--warning {
-      border-color: rgba(245, 158, 11, 0.35);
-      background: rgba(255, 251, 235, 1);
-    }
-
-    &--success {
-      border-color: rgba(96, 168, 31, 0.28);
-      background: rgba(243, 251, 235, 1);
-    }
-
-    &--info {
-      border-color: rgba(59, 130, 246, 0.25);
-      background: rgba(239, 246, 255, 1);
-    }
+  // ─── Source import buttons ────────────────────────────────────────────────
+  &__sources {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
   }
 
-  &__bannerAction {
-    border: 1px solid rgba(148, 163, 184, 0.35);
-    color: rgba(51, 65, 85, 1);
-    background: rgba(255, 255, 255, 0.8);
-
-    &--primary {
-      border-color: rgba(96, 168, 31, 0.35);
-      background: rgba(96, 168, 31, 1);
-      color: #ffffff;
-    }
-
-    &--secondary {
-      border-color: rgba(96, 168, 31, 0.35);
-      background: #ffffff;
-      color: rgba(58, 104, 22, 1);
-    }
-
-    &--ghost {
-      border-color: transparent;
-      background: transparent;
-    }
+  &__sourcesLabel {
+    font-size: 11px;
+    font-weight: 500;
+    color: $uc-color-slate-400;
+    letter-spacing: 0.04em;
   }
 
-  &__toggleBtn {
+  &__sourceBtns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__sourceBtn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 28px;
-    color: rgba(100, 116, 139, 1);
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: $uc-radius-md;
+    border: 1px solid $uc-color-slate-200;
+    background: $uc-color-white;
+    font-size: 12px;
+    font-weight: 600;
+    color: $uc-color-slate-700;
+    cursor: pointer;
+    transition:
+      background 140ms ease,
+      border-color 140ms ease,
+      box-shadow 140ms ease;
 
     &:hover {
-      background: rgba(241, 245, 249, 1);
-    }
-
-    &--active {
-      background: rgba(96, 168, 31, 0.12);
-      color: rgba(58, 104, 22, 1);
-    }
-  }
-
-  &__thumb {
-    flex: 0 0 auto;
-    width: 56px;
-    height: 56px;
-  }
-
-  &__thumbWrapper {
-    width: 64px;
-    height: 64px;
-  }
-
-  &__iconBtn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    color: rgba(100, 116, 139, 1);
-
-    &:hover {
-      background: rgba(241, 245, 249, 1);
-      color: rgba(51, 65, 85, 1);
+      background: $uc-color-slate-50;
+      border-color: $uc-color-slate-300;
+      box-shadow: 0 1px 4px rgba($uc-color-slate-900, 0.07);
     }
 
     &:disabled {
@@ -167,41 +272,564 @@
     }
   }
 
-  &__fileCard,
-  &__fileRow {
-    border-color: rgba(226, 232, 240, 1);
+  &__sourceBtnIcon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  // ─── Hidden inputs ────────────────────────────────────────────────────────
+  &__browseBtn {
+    &:disabled {
+      cursor: not-allowed;
+      background: $uc-color-slate-300;
+    }
+  }
+
+  &__fileInput {
+    display: none;
+  }
+
+  // ─── Banners ──────────────────────────────────────────────────────────────
+  &__banners {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__banner {
+    border-radius: $uc-radius-md;
+    border: 1px solid transparent;
+    padding: 8px 12px;
+    font-size: 12px;
+
+    &--error {
+      border-color: rgba($uc-color-rose, 0.35);
+      background: $uc-color-rose-50;
+    }
+
+    &--warning {
+      border-color: rgba($uc-color-amber, 0.35);
+      background: #fffbeb;
+    }
+
+    &--success {
+      border-color: rgba($uc-color-brand, 0.28);
+      background: #f3fbeb;
+    }
+
+    &--info {
+      border-color: rgba($uc-color-blue, 0.25);
+      background: $uc-color-blue-50;
+    }
+  }
+
+  &__bannerInner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  &__bannerRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__bannerContent {
+    min-width: 0;
+  }
+
+  &__bannerIcon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    width: 16px;
+    height: 16px;
+
+    &--warning {
+      color: $uc-color-amber;
+    }
+  }
+
+  &__bannerTitle {
+    font-weight: 600;
+
+    &--warning {
+      color: $uc-color-amber-800;
+    }
+  }
+
+  &__bannerMsg {
+    margin-top: 2px;
+    color: $uc-color-slate-700;
+
+    &--warning {
+      color: $uc-color-amber-700;
+    }
+  }
+
+  &__bannerActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__bannerAction {
+    border: 1px solid rgba($uc-color-slate-400, 0.35);
+    border-radius: $uc-radius-sm;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(51, 65, 85, 1);
+    background: rgba($uc-color-white, 0.8);
+    cursor: pointer;
+
+    &--primary {
+      border-color: rgba($uc-color-brand, 0.35);
+      background: $uc-color-brand;
+      color: $uc-color-white;
+    }
+
+    &--secondary {
+      border-color: rgba($uc-color-brand, 0.35);
+      background: $uc-color-white;
+      color: $uc-color-brand-dark;
+    }
+
+    &--ghost {
+      border-color: transparent;
+      background: transparent;
+    }
+  }
+
+  // ─── Selected header ──────────────────────────────────────────────────────
+  &__selectedHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
+  }
+
+  &__selectedLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: $uc-color-slate-700;
+  }
+
+  &__selectedLabelIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $uc-radius-md;
+    background: $uc-color-slate-100;
+    padding: 4px;
+    color: $uc-color-slate-500;
+  }
+
+  &__selectedControls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  // ─── View toggle ──────────────────────────────────────────────────────────
+  &__toggle {
+    display: flex;
+    overflow: hidden;
+    border-radius: $uc-radius-md;
+    border: 1px solid $uc-color-slate-200;
+    background: $uc-color-white;
+  }
+
+  &__toggleBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 28px;
+    color: $uc-color-slate-500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      background: $uc-color-slate-100;
+    }
+
+    &--active {
+      background: rgba($uc-color-brand, 0.12);
+      color: $uc-color-brand-dark;
+    }
+  }
+
+  // ─── File count badge ─────────────────────────────────────────────────────
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: $uc-radius-md;
+    background: $uc-color-slate-900;
+    font-size: 12px;
+    font-weight: 600;
+    color: $uc-color-white;
+  }
+
+  // ─── Selected area ────────────────────────────────────────────────────────
+  &__selected {
+    margin-top: 12px;
+  }
+
+  &__selectedEmpty {
+    border-radius: $uc-radius-lg;
+    border: 1px solid $uc-color-slate-100;
+    background:
+      $uc-color-slate-50
+      linear-gradient(135deg, rgba($uc-color-slate-900, 0.02), rgba($uc-color-slate-400, 0.04));
+    padding: 24px 16px;
+    text-align: center;
+    font-size: 12px;
+    color: $uc-color-slate-500;
+  }
+
+  // ─── Grid view ────────────────────────────────────────────────────────────
+  &__selectedGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  // ─── File card (grid) ─────────────────────────────────────────────────────
+  &__fileCard {
+    overflow: hidden;
+    border-radius: $uc-radius-xl;
+    border: 1px solid $uc-color-border;
+    background: $uc-color-white;
 
     &--duplicate {
-      border-color: rgba(245, 158, 11, 0.65);
-      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.10);
+      border-color: rgba($uc-color-amber, 0.65);
+      box-shadow: 0 0 0 2px rgba($uc-color-amber, 0.10);
+    }
+
+    &--renaming {
+      position: relative;
+      border-color: rgba($uc-color-brand, 0.55);
+      box-shadow: 0 0 0 3px rgba($uc-color-brand, 0.10);
     }
   }
 
-  &__selected {
-    &Empty {
-      background-image: linear-gradient(
-        135deg,
-        rgba(15, 23, 42, 0.02),
-        rgba(148, 163, 184, 0.04)
-      );
+  &__cardMedia {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: $uc-color-slate-100;
+  }
+
+  &__cardMediaAsset {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__cardRemove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: $uc-radius-md;
+    background: rgba($uc-color-black, 0.4);
+    color: $uc-color-white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
   }
 
+  &__cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+  }
+
+  &__cardInfo {
+    min-width: 0;
+    flex: 1;
+  }
+
+  // ─── Card filename row (wraps filename + renamed badge) ───────────────────
+  &__cardFilenameRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  &__cardFilename {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 600;
+    color: $uc-color-slate-900;
+  }
+
+  &__cardMeta {
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: $uc-color-slate-500;
+  }
+
+  &__cardProgress {
+    padding: 0 12px 8px;
+  }
+
+  // ─── Progress bar ─────────────────────────────────────────────────────────
+  &__progressBar {
+    height: 4px;
+    overflow: hidden;
+    border-radius: $uc-radius-full;
+    background: $uc-color-slate-100;
+  }
+
+  &__progressFill {
+    height: 100%;
+    background: $uc-color-brand-500;
+    border-radius: $uc-radius-full;
+  }
+
+  // ─── Rename controls ──────────────────────────────────────────────────────
+  &__renameRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__renameInlineInput {
+    height: 28px;
+    min-width: 0;
+    flex: 1;
+    border-radius: $uc-radius-md;
+    border: 1px solid $uc-color-brand-400;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: $uc-color-slate-900;
+    outline: none;
+
+    &:focus {
+      border-color: $uc-color-brand-500;
+      box-shadow: 0 0 0 2px $uc-color-brand-200;
+    }
+  }
+
+  &__renameSave {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: $uc-radius-md;
+    background: $uc-color-brand-600;
+    color: $uc-color-white;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      background: $uc-color-brand-700;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  &__renameCancel {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: $uc-radius-md;
+    border: 1px solid $uc-color-slate-200;
+    background: $uc-color-white;
+    color: $uc-color-slate-500;
+    cursor: pointer;
+
+    &:hover {
+      background: $uc-color-slate-100;
+      color: $uc-color-slate-700;
+    }
+  }
+
+  // ─── Renamed badge ────────────────────────────────────────────────────────
+  &__renamedBadge {
+    flex-shrink: 0;
+    border-radius: $uc-radius-sm;
+    background: $uc-color-brand-50;
+    border: 1px solid rgba($uc-color-brand, 0.30);
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: $uc-color-brand-700;
+    white-space: nowrap;
+  }
+
+  // ─── List view ────────────────────────────────────────────────────────────
+  &__selectedList {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  // ─── File row (list) ──────────────────────────────────────────────────────
+  &__fileRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: $uc-radius-lg;
+    border: 1px solid $uc-color-border;
+    background: $uc-color-white;
+    padding: 12px;
+
+    &--duplicate {
+      border-color: rgba($uc-color-amber, 0.65);
+      box-shadow: 0 0 0 2px rgba($uc-color-amber, 0.10);
+    }
+  }
+
+  &__thumbWrapper {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+  }
+
+  &__thumb {
+    width: 56px;
+    height: 56px;
+    overflow: hidden;
+    border-radius: $uc-radius-md;
+    background: $uc-color-slate-100;
+  }
+
+  &__thumbAsset {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__rowInfo {
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__rowNameRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__rowFilename {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+    color: $uc-color-slate-900;
+  }
+
+  &__duplicateBadge {
+    margin-left: 4px;
+    flex-shrink: 0;
+    border-radius: $uc-radius-sm;
+    background: $uc-color-amber-100;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: $uc-color-amber-800;
+  }
+
+  &__rowMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: $uc-color-slate-500;
+  }
+
+  &__rowStatus {
+    margin-top: 4px;
+  }
+
+  &__rowProgress {
+    margin-top: 8px;
+    height: 6px;
+    overflow: hidden;
+    border-radius: $uc-radius-full;
+    background: $uc-color-slate-100;
+  }
+
+  &__rowError {
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: $uc-color-rose-700;
+  }
+
+  &__rowActions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  // ─── Meta chip ────────────────────────────────────────────────────────────
   &__metaChip {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0 6px;
-    border-radius: 999px;
-    background: rgba(15, 23, 42, 0.04);
-    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: $uc-radius-full;
+    background: rgba($uc-color-slate-900, 0.04);
+    border: 1px solid rgba($uc-color-slate-400, 0.35);
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: rgba(100, 116, 139, 1);
+    color: $uc-color-slate-500;
   }
 
+  // ─── Status badge ─────────────────────────────────────────────────────────
   &__status {
     display: inline-flex;
     align-items: center;
@@ -209,7 +837,7 @@
     min-width: 70px;
     padding: 0 8px;
     height: 20px;
-    border-radius: 999px;
+    border-radius: $uc-radius-full;
     border: 1px solid transparent;
     font-size: 10px;
     font-weight: 700;
@@ -217,78 +845,188 @@
     text-transform: uppercase;
 
     &--queued {
-      border-color: rgba(148, 163, 184, 0.6);
-      background: rgba(248, 250, 252, 1);
-      color: rgba(100, 116, 139, 1);
+      border-color: rgba($uc-color-slate-400, 0.6);
+      background: $uc-color-slate-50;
+      color: $uc-color-slate-500;
     }
 
     &--uploading {
-      border-color: rgba(59, 130, 246, 0.6);
-      background: rgba(239, 246, 255, 1);
-      color: rgba(37, 99, 235, 1);
+      border-color: rgba($uc-color-blue, 0.6);
+      background: $uc-color-blue-50;
+      color: $uc-color-blue-600;
     }
 
     &--uploaded {
-      border-color: rgba(34, 197, 94, 0.6);
-      background: rgba(240, 253, 250, 1);
-      color: rgba(22, 163, 74, 1);
+      border-color: rgba($uc-color-green, 0.6);
+      background: #f0fdfa;
+      color: $uc-color-green-600;
     }
 
     &--error {
-      border-color: rgba(248, 113, 113, 0.7);
-      background: rgba(254, 242, 242, 1);
-      color: rgba(185, 28, 28, 1);
+      border-color: rgba($uc-color-rose, 0.7);
+      background: $uc-color-rose-50;
+      color: $uc-color-rose-700;
     }
   }
 
-  &__fileCard {
-    &--renaming {
-      position: relative;
-      border-color: rgba(96, 168, 31, 0.55);
-      box-shadow: 0 0 0 3px rgba(96, 168, 31, 0.10);
+  // ─── Icon button ──────────────────────────────────────────────────────────
+  &__iconBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: $uc-radius-md;
+    color: $uc-color-slate-500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      background: $uc-color-slate-100;
+      color: $uc-color-slate-900;
     }
 
-    &--renaming::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: -10px;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 10px solid rgba(96, 168, 31, 0.35);
-      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.02));
-      pointer-events: none;
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
   }
 
+  // ─── SVG icons ───────────────────────────────────────────────────────────
+  &__icon {
+    &--xs { width: 12px; height: 12px; }
+    &--sm { width: 16px; height: 16px; }
+    &--md { width: 20px; height: 20px; }
+    &--lg { width: 32px; height: 32px; }
+  }
+
+  // ─── Footer ───────────────────────────────────────────────────────────────
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  &__btnClose {
+    border-radius: $uc-radius-md;
+    background: $uc-color-slate-100;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: $uc-color-slate-700;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      background: $uc-color-slate-200;
+    }
+  }
+
+  &__btnUpload {
+    border-radius: $uc-radius-md;
+    background: $uc-color-brand-600;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: $uc-color-white;
+    border: none;
+    cursor: pointer;
+
+    &:hover {
+      background: $uc-color-brand-700;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background: $uc-color-slate-300;
+    }
+  }
+
+  // ─── Success overlay ──────────────────────────────────────────────────────
+  &__success {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 12px;
+    background: rgba($uc-color-black, 0.5);
+  }
+
+  &__successModal {
+    width: 100%;
+    max-width: 28rem; // max-w-md
+    border-radius: $uc-radius-xl;
+    background: $uc-color-white;
+    padding: 24px;
+    box-shadow: $uc-shadow-modal;
+  }
+
+  &__successHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  &__successTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: $uc-color-slate-900;
+  }
+
+  &__successSubtitle {
+    margin-top: 4px;
+    font-size: 12px;
+    color: $uc-color-slate-500;
+  }
+
+  &__successBanner {
+    margin-top: 20px;
+    border-radius: $uc-radius-lg;
+    background: $uc-color-brand-50;
+    padding: 16px;
+    font-size: 12px;
+    color: darken($uc-color-brand-dark, 5%);
+  }
+
+  &__successActions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  // ─── Rename grid panel arrow ──────────────────────────────────────────────
   &__rename {
     &--grid {
       position: relative;
-    }
 
-    &--grid::before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: -10px;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 10px solid rgba(96, 168, 31, 0.35);
-      pointer-events: none;
+      &::before {
+        content: '';
+        position: absolute;
+        left: var(--arrow-offset, 16.67%);
+        top: -10px;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid rgba($uc-color-brand, 0.35);
+        pointer-events: none;
+      }
     }
   }
 }
 
+// ─── Reduced motion ───────────────────────────────────────────────────────────
 @media (prefers-reduced-motion: reduce) {
   .upload-content__dropzone,
   .upload-content__cloud {
     transition: none !important;
   }
 }
-

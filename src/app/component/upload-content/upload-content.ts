@@ -131,7 +131,7 @@ export class UploadContentComponent implements OnInit, OnDestroy {
   protected readonly isDragging = signal(false);
   protected readonly viewMode = signal<UploadContentViewMode>('grid');
 
-  protected readonly queue = signal<UploadContentUploadQueueItem[]>([]);
+  protected readonly queue = signal<(UploadContentUploadQueueItem & { isRenamed?: boolean })[]>([]);
   protected readonly library = signal<UploadContentLibraryItem[]>([]);
   protected readonly errors = signal<string[]>([]);
 
@@ -247,47 +247,59 @@ export class UploadContentComponent implements OnInit, OnDestroy {
     if (this.isUploading()) return;
 
     if (this.useFilestackPicker && this.client?.picker) {
-      this.emitUploadEvent('Uploading');
-      const picker = this.client.picker({
-        fromSources: ['local_file_system'],
-        accept: this.allowedExtensions.map((e) => `.${String(e).toLowerCase()}`),
-        maxFiles: this.maxFiles,
-        onUploadDone: (res: any) => {
-          const files = (res?.filesUploaded ?? []) as any[];
-          const next = files.map((f) => ({
-            id: uploadContentCreateId('lib'),
-            title: uploadContentGetTitleFromFilename(String(f.filename ?? '')),
-            filename: String(f.filename ?? ''),
-            url: String(f.url ?? ''),
-            handle: String(f.handle ?? ''),
-            mimetype: String(f.mimetype ?? ''),
-            sizeBytes: typeof f.size === 'number' ? f.size : undefined,
-            isVideo: uploadContentIsVideoByExtension(
-              uploadContentGetExtension(String(f.filename ?? ''))
-            ),
-            uploadedAtIso: new Date().toISOString()
-          })) as UploadContentLibraryItem[];
-
-          this.library.set([...next, ...this.library()]);
-          this.emitUploadEvent('Uploaded');
-        },
-        onFileUploadFailed: (_file: any, err: any) => {
-          const msg =
-            typeof err === 'string'
-              ? err
-              : err?.message
-                ? String(err.message)
-                : 'An upload failed.';
-          this.errors.set([msg]);
-          this.emitUploadEvent('Uploaded');
-        }
-      });
-
-      picker.open();
+      this.openPicker(['local_file_system', 'googledrive', 'dropbox']);
       return;
     }
 
     this.fileInputRef().nativeElement.click();
+  }
+
+  protected openSource(source: 'googledrive' | 'dropbox', ev: MouseEvent): void {
+    ev.stopPropagation();
+    if (this.isUploading()) return;
+    this.openPicker([source]);
+  }
+
+  private openPicker(fromSources: string[]): void {
+    if (!this.client?.picker) return;
+
+    this.emitUploadEvent('Uploading');
+    const picker = this.client.picker({
+      fromSources,
+      accept: this.allowedExtensions.map((e) => `.${String(e).toLowerCase()}`),
+      maxFiles: this.maxFiles,
+      onUploadDone: (res: any) => {
+        const files = (res?.filesUploaded ?? []) as any[];
+        const next = files.map((f) => ({
+          id: uploadContentCreateId('lib'),
+          title: uploadContentGetTitleFromFilename(String(f.filename ?? '')),
+          filename: String(f.filename ?? ''),
+          url: String(f.url ?? ''),
+          handle: String(f.handle ?? ''),
+          mimetype: String(f.mimetype ?? ''),
+          sizeBytes: typeof f.size === 'number' ? f.size : undefined,
+          isVideo: uploadContentIsVideoByExtension(
+            uploadContentGetExtension(String(f.filename ?? ''))
+          ),
+          uploadedAtIso: new Date().toISOString()
+        })) as UploadContentLibraryItem[];
+
+        this.library.set([...next, ...this.library()]);
+        this.emitUploadEvent('Uploaded');
+      },
+      onFileUploadFailed: (_file: any, err: any) => {
+        const msg =
+          typeof err === 'string'
+            ? err
+            : err?.message
+              ? String(err.message)
+              : 'An upload failed.';
+        this.errors.set([msg]);
+        this.emitUploadEvent('Uploaded');
+      }
+    });
+
+    picker.open();
   }
 
   protected onFileInputChange(ev: Event): void {
@@ -334,7 +346,15 @@ export class UploadContentComponent implements OnInit, OnDestroy {
         : this.library().find((l) => l.id === id);
     if (!item) return;
     this.renameTarget.set({ kind, id });
-    this.renameDraft.set((item as any).title ?? '');
+
+    if (kind === 'queue') {
+      const filename = (item as any).filename ?? '';
+      const dotIndex = filename.lastIndexOf('.');
+      // Seed draft with name only, no extension
+      this.renameDraft.set(dotIndex !== -1 ? filename.slice(0, dotIndex) : filename);
+    } else {
+      this.renameDraft.set((item as any).title ?? '');
+    }
   }
 
   protected cancelRename(): void {
@@ -350,8 +370,17 @@ export class UploadContentComponent implements OnInit, OnDestroy {
     if (!desired) return;
 
     if (target.kind === 'queue') {
+      const original = this.queue().find((q) => q.id === target.id);
+      const originalFilename = (original as any)?.filename ?? '';
+      const dotIndex = originalFilename.lastIndexOf('.');
+      // Reattach the original extension
+      const ext = dotIndex !== -1 ? originalFilename.slice(dotIndex) : '';
+      const newFilename = desired + ext;
+
       const next = this.queue().map((q) =>
-        q.id === target.id ? { ...q, title: desired } : q
+        q.id === target.id
+          ? { ...q, filename: newFilename, isRenamed: true }
+          : q
       );
       this.queue.set(next);
       this.syncDuplicates();
@@ -379,7 +408,9 @@ export class UploadContentComponent implements OnInit, OnDestroy {
       const suggested = this.getSuggestedTitleFor(firstDup.id);
       this.queue.set(
         this.queue().map((q) =>
-          q.id === firstDup.id ? { ...q, title: suggested } : q
+          q.id === firstDup.id
+            ? { ...q, title: suggested, isRenamed: true }
+            : q
         )
       );
       this.syncDuplicates();
@@ -424,6 +455,7 @@ export class UploadContentComponent implements OnInit, OnDestroy {
     if (allSucceeded) this.successOpen.set(true);
 
     this.emitUploadEvent('Uploaded');
+    this.cancelRename();
   }
 
   protected dismissSuccess(): void {
@@ -449,7 +481,7 @@ export class UploadContentComponent implements OnInit, OnDestroy {
     }
 
     const rejected: string[] = [];
-    const accepted: UploadContentUploadQueueItem[] = [];
+    const accepted: (UploadContentUploadQueueItem & { isRenamed?: boolean })[] = [];
 
     for (const file of files) {
       const ext = uploadContentGetExtension(file.name);
@@ -472,7 +504,8 @@ export class UploadContentComponent implements OnInit, OnDestroy {
         filename: file.name,
         extension: ext,
         isVideo: uploadContentIsVideoByExtension(ext),
-        sizeBytes: file.size
+        sizeBytes: file.size,
+        isRenamed: false
       });
     }
 
@@ -620,4 +653,3 @@ export class UploadContentComponent implements OnInit, OnDestroy {
     this.objectUrls.delete(id);
   }
 }
-
