@@ -39,6 +39,8 @@ export interface UploadContentUploadQueueItem {
   isVideo: boolean;
   sizeBytes: number;
   errorMessage?: string;
+  hasInvalidFilename?: boolean;
+  filenameTooLong?: boolean;    
   isDuplicateTitle?: boolean;
   duplicateTitleOfId?: string;
 }
@@ -71,3 +73,6 @@ export interface UploadContentConfig {
   viewMode: UploadContentViewMode;
 }
 
+
+// The rest of your existing types remain unchanged below this point
+// (UploadContentLibraryItem, UploadContentEvent, UploadContentBanner, etc.)

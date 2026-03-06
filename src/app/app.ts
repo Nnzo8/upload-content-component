@@ -19,6 +19,8 @@ import { uploadContentSanitizeTitle } from './component/upload-content/upload-co
 })
 export class App {
   protected readonly filestackApiKey = signal(environment.filestack.apiKey);
+  protected readonly googleApiKey = signal(environment.google.apiKey);
+  protected readonly googleClientId = signal(environment.google.clientId);
   protected readonly lastUploadEvent = signal<UploadContentEvent | null>(null);
   protected readonly showUpload = signal(false);
   protected readonly library = signal<UploadContentLibraryItem[]>([]);

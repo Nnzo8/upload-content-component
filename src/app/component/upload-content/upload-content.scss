@@ -37,11 +37,13 @@ $uc-color-blue-600:      #2563eb;
 $uc-color-blue-50:       #eff6ff;
 
 $uc-color-green:         #22c55e;
-$uc-color-green-50:      #f0fdf4;  // teal-ish: #f0fdfa used for uploaded badge
+$uc-color-green-50:      #f0fdf4;
 $uc-color-green-600:     #16a34a;
 
 $uc-color-rose:          #f87171;
 $uc-color-rose-50:       #fef2f2;
+$uc-color-rose-100:      #fee2e2;
+$uc-color-rose-600:      #dc2626;
 $uc-color-rose-700:      #b91c1c;
 
 // ─── Spacing / Sizing Variables ─────────────────────────────────────────────
@@ -66,11 +68,13 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
 
   &__modal {
     width: 100%;
-    max-width: 80rem; // max-w-7xl
+    max-width: 80rem;
     border-radius: $uc-radius-xl;
     background: $uc-color-white;
     box-shadow: $uc-shadow-modal;
     border: 1px solid rgba($uc-color-border, 0.9);
+    // Hard stop — nothing inside can blow out the modal width.
+    overflow: hidden;
   }
 
   // ─── Header ──────────────────────────────────────────────────────────────
@@ -115,6 +119,8 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
   // ─── Body ─────────────────────────────────────────────────────────────────
   &__body {
     padding: 0 24px 24px;
+    // Prevents overflowing card content from pushing past the body width.
+    overflow: hidden;
   }
 
   // ─── Dropzone ─────────────────────────────────────────────────────────────
@@ -502,28 +508,58 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
   // ─── Grid view ────────────────────────────────────────────────────────────
   &__selectedGrid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    // minmax(0, 1fr) — the 0 min prevents grid cells from expanding beyond
+    // their 1fr share when content overflows (e.g. a very long filename).
+    // Without this, a long unbreakable string blows out the entire grid.
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
 
     @media (min-width: 1024px) {
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(5, minmax(0, 1fr));
     }
   }
 
   // ─── File card (grid) ─────────────────────────────────────────────────────
+  // overflow must NOT be hidden — the rename tooltip is position:absolute and
+  // must escape the card boundary. We restore rounded corners by clipping
+  // only the media element (which has its own border-radius).
   &__fileCard {
-    overflow: hidden;
+    // overflow:visible is required so the position:absolute rename tooltip
+    // can escape the card boundary. overflow:clip looks safe on paper but
+    // browsers still clip absolute children with it in practice.
+    // Layout is contained by: minmax(0,1fr) grid columns + overflow:hidden
+    // on __modal/__body (outermost hard walls) + fixed height:160px.
+    overflow: visible;
     border-radius: $uc-radius-xl;
     border: 1px solid $uc-color-border;
     background: $uc-color-white;
+    // Fixed total height — absolutely nothing inside can stretch the card.
+    // Media fills the space above the 52px footer via flex-grow.
+    display: flex;
+    flex-direction: column;
+    height: 160px;
+    // Cards form a stacking context so z-index between siblings works.
+    position: relative;
+    z-index: 0;
+
+    // While the tooltip is open, elevate this card above its siblings so the
+    // bubble is never obscured by an adjacent card.
+    &:has(.upload-content__renameTooltip) {
+      z-index: 10;
+    }
 
     &--duplicate {
       border-color: rgba($uc-color-amber, 0.65);
       box-shadow: 0 0 0 2px rgba($uc-color-amber, 0.10);
     }
 
+    // Invalid filename takes visual priority over duplicate
+    &--invalid {
+      border-color: rgba($uc-color-rose, 0.65);
+      box-shadow: 0 0 0 2px rgba($uc-color-rose, 0.10);
+    }
+
     &--renaming {
-      position: relative;
       border-color: rgba($uc-color-brand, 0.55);
       box-shadow: 0 0 0 3px rgba($uc-color-brand, 0.10);
     }
@@ -531,8 +567,15 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
 
   &__cardMedia {
     position: relative;
-    aspect-ratio: 16 / 9;
+    // flex-grow fills all card height above the fixed footer (160px - 52px = 108px).
+    // Never use aspect-ratio here — it would fight the card's fixed height
+    // and cause the stretching seen when cards are wide.
+    flex: 1 1 0;
+    min-height: 0;
     background: $uc-color-slate-100;
+    // Clip the thumbnail corners here instead of on the card itself.
+    overflow: hidden;
+    border-radius: $uc-radius-xl $uc-radius-xl 0 0;
   }
 
   &__cardMediaAsset {
@@ -567,23 +610,38 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
+    // Fixed height — the footer never grows regardless of filename length.
+    height: 52px;
+    flex-shrink: 0;
+    padding: 0 12px;
+    gap: 4px;
+    // Clip anything that somehow overflows the fixed height.
+    overflow: hidden;
   }
 
   &__cardInfo {
     min-width: 0;
     flex: 1;
+    // Clip vertically so two-line text can't push the footer taller.
+    overflow: hidden;
   }
 
-  // ─── Card filename row (wraps filename + renamed badge) ───────────────────
+  // ─── Card filename row ────────────────────────────────────────────────────
   &__cardFilenameRow {
     display: flex;
     align-items: center;
     gap: 4px;
     min-width: 0;
+    // Prevent the row from ever widening the card.
+    width: 100%;
+    overflow: hidden;
   }
 
   &__cardFilename {
+    // min-width:0 lets the flex child shrink below its content size so
+    // text-overflow:ellipsis actually fires instead of stretching the card.
+    min-width: 0;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -622,14 +680,31 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
   // ─── Rename controls ──────────────────────────────────────────────────────
   &__renameRow {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 4px;
+  }
+
+  // ─── Rename input wrapper ─────────────────────────────────────────────────
+  // The tooltip is anchored to the card (position:relative), not this wrapper,
+  // so this element does NOT need position:relative.
+  &__renameInputWrap {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+
+    &--list {
+      // In list view the wrapper IS the anchor for the tooltip because there
+      // is no card container — use position:relative here only.
+      position: relative;
+      flex: 1;
+    }
   }
 
   &__renameInlineInput {
     height: 28px;
+    width: 100%;
     min-width: 0;
-    flex: 1;
     border-radius: $uc-radius-md;
     border: 1px solid $uc-color-brand-400;
     padding: 0 8px;
@@ -637,11 +712,89 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
     font-weight: 600;
     color: $uc-color-slate-900;
     outline: none;
+    transition:
+      border-color 120ms ease,
+      box-shadow 120ms ease;
 
     &:focus {
       border-color: $uc-color-brand-500;
       box-shadow: 0 0 0 2px $uc-color-brand-200;
     }
+
+    // ── Error state ──────────────────────────────────────────────────────
+    &--error {
+      border-color: $uc-color-rose-600 !important;
+      background: $uc-color-rose-50;
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba($uc-color-rose, 0.20) !important;
+      }
+    }
+  }
+
+  // ─── Floating rename validation tooltip ───────────────────────────────────
+  // Rendered as an absolutely-positioned bubble above the rename input.
+  // The __renameInputWrap must have position:relative so the tooltip anchors
+  // to it correctly.
+  &__renameTooltip {
+    // In grid view the nearest position:relative ancestor is __fileCard,
+    // so the tooltip sits centered above the whole card.
+    // In list view __renameInputWrap--list is position:relative, so the
+    // tooltip sits above that wrapper instead.
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    // Must exceed the card's own z-index (10) and any siblings (0).
+    z-index: 20;
+
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+
+    min-width: 180px;
+    max-width: 220px;
+    white-space: normal;
+    padding: 8px 10px;
+    border-radius: $uc-radius-md;
+    background: $uc-color-slate-900;
+    color: $uc-color-white;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.45;
+    box-shadow:
+      0 4px 16px rgba($uc-color-slate-900, 0.22),
+      0 1px 4px rgba($uc-color-slate-900, 0.12);
+
+    // Subtle entrance animation
+    animation: uc-tooltip-in 140ms cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none; // tooltip is display-only
+  }
+
+  &__renameTooltipIcon {
+    flex-shrink: 0;
+    width: 13px;
+    height: 13px;
+    margin-top: 1px;
+    color: $uc-color-rose; // rose-400 — visible against dark bg
+  }
+
+  // Downward-pointing caret connecting the bubble to the input
+  &__renameTooltipArrow {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid $uc-color-slate-900;
+  }
+
+  @keyframes uc-tooltip-in {
+    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
   }
 
   &__renameSave {
@@ -656,6 +809,7 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
     color: $uc-color-white;
     border: none;
     cursor: pointer;
+    transition: background 140ms ease;
 
     &:hover {
       background: $uc-color-brand-700;
@@ -663,7 +817,8 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
 
     &:disabled {
       cursor: not-allowed;
-      opacity: 0.5;
+      opacity: 0.45;
+      background: $uc-color-slate-300;
     }
   }
 
@@ -700,6 +855,20 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
     white-space: nowrap;
   }
 
+  // ─── Invalid filename badge ───────────────────────────────────────────────
+  &__invalidBadge {
+    flex-shrink: 0;
+    border-radius: $uc-radius-sm;
+    background: $uc-color-rose-50;
+    border: 1px solid rgba($uc-color-rose, 0.40);
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: $uc-color-rose-700;
+    white-space: nowrap;
+  }
+
   // ─── List view ────────────────────────────────────────────────────────────
   &__selectedList {
     display: grid;
@@ -724,6 +893,12 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
     &--duplicate {
       border-color: rgba($uc-color-amber, 0.65);
       box-shadow: 0 0 0 2px rgba($uc-color-amber, 0.10);
+    }
+
+    // Invalid filename takes visual priority over duplicate
+    &--invalid {
+      border-color: rgba($uc-color-rose, 0.65);
+      box-shadow: 0 0 0 2px rgba($uc-color-rose, 0.10);
     }
   }
 
@@ -754,11 +929,15 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
 
   &__rowNameRow {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 4px;
+    min-width: 0;
+    overflow: hidden;
   }
 
   &__rowFilename {
+    min-width: 0;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -959,46 +1138,69 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
 
   &__successModal {
     width: 100%;
-    max-width: 28rem; // max-w-md
+    max-width: 22rem;
     border-radius: $uc-radius-xl;
     background: $uc-color-white;
-    padding: 24px;
+    padding: 36px 28px 28px;
     box-shadow: $uc-shadow-modal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
-  &__successHeader {
+  &__successIconWrap {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: $uc-radius-full;
+    background: rgba($uc-color-brand, 0.12);
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+
+  &__successIcon {
+    width: 28px;
+    height: 28px;
+    color: $uc-color-brand-600;
   }
 
   &__successTitle {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
     color: $uc-color-slate-900;
+    margin-bottom: 8px;
   }
 
   &__successSubtitle {
-    margin-top: 4px;
-    font-size: 12px;
+    font-size: 13px;
     color: $uc-color-slate-500;
+    line-height: 1.5;
+    margin-bottom: 28px;
   }
 
-  &__successBanner {
-    margin-top: 20px;
-    border-radius: $uc-radius-lg;
-    background: $uc-color-brand-50;
-    padding: 16px;
-    font-size: 12px;
-    color: darken($uc-color-brand-dark, 5%);
-  }
+  &__successBtn {
+    display: block;
+    width: 100%;
+    border-radius: $uc-radius-md;
+    background: $uc-color-brand-500;
+    padding: 11px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: $uc-color-white;
+    border: none;
+    cursor: pointer;
+    transition: background 140ms ease;
 
-  &__successActions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 24px;
+    &:hover {
+      background: $uc-color-brand-600;
+    }
+
+    &:active {
+      background: $uc-color-brand-700;
+    }
   }
 
   // ─── Rename grid panel arrow ──────────────────────────────────────────────
@@ -1028,5 +1230,9 @@ $uc-shadow-modal: 0 20px 60px rgba($uc-color-slate-900, 0.18), 0 2px 8px rgba($u
   .upload-content__dropzone,
   .upload-content__cloud {
     transition: none !important;
+  }
+
+  .upload-content__renameTooltip {
+    animation: none !important;
   }
 }

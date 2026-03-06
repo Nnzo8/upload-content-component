@@ -1,7 +1,4 @@
-<div
-  *ngIf="isOpen()"
-  class="upload-content"
->
+<div *ngIf="isOpen()" class="upload-content">
   <div class="upload-content__modal">
     <div class="upload-content__header">
       <div>
@@ -10,13 +7,9 @@
           Upload images and videos to your channel library
         </div>
       </div>
-      <button
-        type="button"
-        class="upload-content__close"
-        (click)="close()"
-        aria-label="Close"
-      >
-        <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--md" fill="none" stroke="currentColor" stroke-width="2">
+      <button type="button" class="upload-content__close" (click)="close()" aria-label="Close">
+        <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--md" fill="none" stroke="currentColor"
+          stroke-width="2">
           <path d="M18 6 6 18" />
           <path d="m6 6 12 12" />
         </svg>
@@ -24,18 +17,14 @@
     </div>
 
     <div class="upload-content__body">
-      <div
-        class="upload-content__dropzone"
-        [class.upload-content__dropzone--dragging]="isDragging()"
+      <div class="upload-content__dropzone" [class.upload-content__dropzone--dragging]="isDragging()"
         [class.upload-content__dropzone--disabled]="isUploading()"
-        (click)="!isUploading() && !maxReached() && openBrowse()"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event)"
-      >
+        (click)="!isUploading() && !maxReached() && openBrowse()" (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
         <div class="upload-content__dropzoneInner">
           <div class="upload-content__cloud">
-            <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--lg" fill="none" stroke="currentColor" stroke-width="1.8">
+            <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--lg" fill="none"
+              stroke="currentColor" stroke-width="1.8">
               <path d="M7 18a4 4 0 0 1 0-8 5 5 0 0 1 9.7-1.7A4.5 4.5 0 0 1 18.5 18H7Z" />
               <path d="M12 12v7" />
               <path d="m8.5 14.5 3.5-3.5 3.5 3.5" />
@@ -60,34 +49,36 @@
             <div class="upload-content__sourceBtns">
 
               <!-- Google Drive -->
-              <button
-                type="button"
-                class="upload-content__sourceBtn upload-content__sourceBtn--gdrive"
-                [disabled]="isUploading() || maxReached()"
-                (click)="openSource('googledrive', $event)"
-                aria-label="Import from Google Drive"
-              >
+              <button type="button" class="upload-content__sourceBtn upload-content__sourceBtn--gdrive"
+                [disabled]="isUploading() || maxReached()" (click)="openSource('googledrive', $event)"
+                aria-label="Import from Google Drive">
                 <svg class="upload-content__sourceBtnIcon" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
-                  <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
-                  <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
-                  <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
-                  <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
-                  <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
-                  <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+                  <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z"
+                    fill="#0066da" />
+                  <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z"
+                    fill="#00ac47" />
+                  <path
+                    d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z"
+                    fill="#ea4335" />
+                  <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z"
+                    fill="#00832d" />
+                  <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z"
+                    fill="#2684fc" />
+                  <path
+                    d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z"
+                    fill="#ffba00" />
                 </svg>
                 Google Drive
               </button>
 
               <!-- Dropbox -->
-              <button
-                type="button"
-                class="upload-content__sourceBtn upload-content__sourceBtn--dropbox"
-                [disabled]="isUploading() || maxReached()"
-                (click)="openSource('dropbox', $event)"
-                aria-label="Import from Dropbox"
-              >
+              <button type="button" class="upload-content__sourceBtn upload-content__sourceBtn--dropbox"
+                [disabled]="isUploading() || maxReached()" (click)="openSource('dropbox', $event)"
+                aria-label="Import from Dropbox">
                 <svg class="upload-content__sourceBtnIcon" viewBox="0 0 43 40" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12.6 0L0 8.1l8.8 7 12.6-7.8L12.6 0zM0 22.2l12.6 8.2 8.8-7.1-12.6-7.9L0 22.2zM21.4 23.3l8.8 7.1 12.6-8.2-9-7-12.4 8.1zM42.8 8.1L30.2 0l-8.8 7.3 12.6 7.8 8.8-7zM21.5 24.9l-8.9 7.1-3.8-2.4V32l12.7 7.7L33.2 32v-2.4l-3.8 2.4-7.9-7.1z" fill="#0061FF"/>
+                  <path
+                    d="M12.6 0L0 8.1l8.8 7 12.6-7.8L12.6 0zM0 22.2l12.6 8.2 8.8-7.1-12.6-7.9L0 22.2zM21.4 23.3l8.8 7.1 12.6-8.2-9-7-12.4 8.1zM42.8 8.1L30.2 0l-8.8 7.3 12.6 7.8 8.8-7zM21.5 24.9l-8.9 7.1-3.8-2.4V32l12.7 7.7L33.2 32v-2.4l-3.8 2.4-7.9-7.1z"
+                    fill="#0061FF" />
                 </svg>
                 Dropbox
               </button>
@@ -95,52 +86,38 @@
             </div>
           </div>
 
-          <button
-            type="button"
-            class="upload-content__browseBtn"
-            (click)="$event.stopPropagation()"
-            [disabled]="isUploading() || maxReached()"
-          >
+          <button type="button" class="upload-content__browseBtn" (click)="$event.stopPropagation()"
+            [disabled]="isUploading() || maxReached()">
           </button>
 
-          <input
-            #fileInput
-            class="upload-content__fileInput"
-            type="file"
-            [attr.accept]="acceptAttribute"
-            [attr.multiple]="true"
-            (change)="onFileInputChange($event)"
-          />
+          <input #fileInput class="upload-content__fileInput" type="file" [attr.accept]="acceptAttribute"
+            [attr.multiple]="true" (change)="onFileInputChange($event)" />
         </div>
       </div>
 
       <div class="upload-content__banners">
         <!-- Max files warning -->
-        <div
-          *ngIf="maxReached()"
-          class="upload-content__banner upload-content__banner--warning"
-        >
+        <div *ngIf="maxReached()" class="upload-content__banner upload-content__banner--warning">
           <div class="upload-content__bannerInner">
-            <svg viewBox="0 0 24 24" class="upload-content__bannerIcon upload-content__bannerIcon--warning" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" class="upload-content__bannerIcon upload-content__bannerIcon--warning" fill="none"
+              stroke="currentColor" stroke-width="2">
               <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
               <path d="M12 9v4" />
               <path d="M12 17h.01" />
             </svg>
             <div>
               <div class="upload-content__bannerTitle upload-content__bannerTitle--warning">Maximum files reached</div>
-              <div class="upload-content__bannerMsg upload-content__bannerMsg--warning">You can only upload up to 10 files at a time. Remove a file to add another.</div>
+              <div class="upload-content__bannerMsg upload-content__bannerMsg--warning">You can only upload up to 10
+                files at a time. Remove a file to add another.</div>
             </div>
           </div>
         </div>
 
-        <div
-          *ngFor="let b of banners()"
-          class="upload-content__banner"
+        <div *ngFor="let b of banners()" class="upload-content__banner"
           [class.upload-content__banner--error]="b.kind === 'error'"
           [class.upload-content__banner--warning]="b.kind === 'warning'"
           [class.upload-content__banner--success]="b.kind === 'success'"
-          [class.upload-content__banner--info]="b.kind === 'info'"
-        >
+          [class.upload-content__banner--info]="b.kind === 'info'">
           <div class="upload-content__bannerRow">
             <div class="upload-content__bannerContent">
               <div class="upload-content__bannerTitle">{{ b.title }}</div>
@@ -148,15 +125,11 @@
             </div>
 
             <div *ngIf="b.actions?.length" class="upload-content__bannerActions">
-              <button
-                *ngFor="let a of b.actions"
-                type="button"
-                class="upload-content__bannerAction"
+              <button *ngFor="let a of b.actions" type="button" class="upload-content__bannerAction"
                 [class.upload-content__bannerAction--primary]="a.variant === 'primary'"
                 [class.upload-content__bannerAction--secondary]="a.variant === 'secondary'"
                 [class.upload-content__bannerAction--ghost]="a.variant === 'ghost'"
-                (click)="onBannerAction(b.id, a.id)"
-              >
+                (click)="onBannerAction(b.id, a.id)">
                 {{ a.label }}
               </button>
             </div>
@@ -164,13 +137,11 @@
         </div>
       </div>
 
-      <div
-        class="upload-content__selectedHeader"
-        *ngIf="queue().length > 0"
-      >
+      <div class="upload-content__selectedHeader" *ngIf="queue().length > 0">
         <div class="upload-content__selectedLabel">
           <span class="upload-content__selectedLabelIcon">
-            <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none"
+              stroke="currentColor" stroke-width="2">
               <path d="M4 19V5" />
               <path d="M4 5h16" />
               <path d="M4 12h16" />
@@ -182,14 +153,11 @@
 
         <div class="upload-content__selectedControls">
           <div class="upload-content__toggle">
-            <button
-              type="button"
-              class="upload-content__toggleBtn"
-              [class.upload-content__toggleBtn--active]="viewMode() === 'list'"
-              (click)="setViewMode('list')"
-              aria-label="List view"
-            >
-              <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none" stroke="currentColor" stroke-width="2">
+            <button type="button" class="upload-content__toggleBtn"
+              [class.upload-content__toggleBtn--active]="viewMode() === 'list'" (click)="setViewMode('list')"
+              aria-label="List view">
+              <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M8 6h13" />
                 <path d="M8 12h13" />
                 <path d="M8 18h13" />
@@ -198,14 +166,11 @@
                 <path d="M3 18h.01" />
               </svg>
             </button>
-            <button
-              type="button"
-              class="upload-content__toggleBtn"
-              [class.upload-content__toggleBtn--active]="viewMode() === 'grid'"
-              (click)="setViewMode('grid')"
-              aria-label="Grid view"
-            >
-              <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none" stroke="currentColor" stroke-width="2">
+            <button type="button" class="upload-content__toggleBtn"
+              [class.upload-content__toggleBtn--active]="viewMode() === 'grid'" (click)="setViewMode('grid')"
+              aria-label="Grid view">
+              <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M3 3h8v8H3z" />
                 <path d="M13 3h8v8h-8z" />
                 <path d="M3 13h8v8H3z" />
@@ -220,51 +185,27 @@
       </div>
 
       <div class="upload-content__selected">
-        <div
-          *ngIf="queue().length === 0"
-          class="upload-content__selectedEmpty"
-        >
+        <div *ngIf="queue().length === 0" class="upload-content__selectedEmpty">
           No files selected yet.
         </div>
 
-        <!-- Grid view -->
-        <div
-          *ngIf="queue().length > 0 && viewMode() === 'grid'"
-          class="upload-content__selectedGrid"
-        >
-          <div
-            *ngFor="let q of queue()"
-            class="upload-content__fileCard"
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Grid view                                                        -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div *ngIf="queue().length > 0 && viewMode() === 'grid'" class="upload-content__selectedGrid">
+          <div *ngFor="let q of queue(); trackBy: trackById" class="upload-content__fileCard"
             [class.upload-content__fileCard--duplicate]="q.isDuplicateTitle"
-            [class.upload-content__fileCard--renaming]="renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id"
-          >
+            [class.upload-content__fileCard--invalid]="q.hasInvalidFilename"
+            [class.upload-content__fileCard--renaming]="renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id">
             <div class="upload-content__cardMedia">
-              <video
-                *ngIf="q.isVideo"
-                class="upload-content__cardMediaAsset"
-                [src]="q.objectUrl"
-                muted
-                playsinline
-                loop
-                (mouseenter)="videoEnter(vg)"
-                (mouseleave)="videoLeave(vg)"
-                #vg
-              ></video>
-              <img
-                *ngIf="!q.isVideo"
-                class="upload-content__cardMediaAsset"
-                [src]="q.objectUrl"
-                [alt]="q.filename"
-              />
+              <video *ngIf="q.isVideo" class="upload-content__cardMediaAsset" [src]="q.objectUrl" muted playsinline loop
+                (mouseenter)="videoEnter(vg)" (mouseleave)="videoLeave(vg)" #vg></video>
+              <img *ngIf="!q.isVideo" class="upload-content__cardMediaAsset" [src]="q.objectUrl" [alt]="q.filename" />
 
-              <button
-                type="button"
-                class="upload-content__cardRemove"
-                (click)="removeFromQueue(q.id)"
-                [disabled]="q.status === 'uploading'"
-                aria-label="Remove"
-              >
-                <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none" stroke="currentColor" stroke-width="2">
+              <button type="button" class="upload-content__cardRemove" (click)="removeFromQueue(q.id)"
+                [disabled]="q.status === 'uploading'" aria-label="Remove">
+                <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none"
+                  stroke="currentColor" stroke-width="2">
                   <path d="M18 6 6 18" />
                   <path d="m6 6 12 12" />
                 </svg>
@@ -274,37 +215,40 @@
             <div class="upload-content__cardFooter">
               <div class="upload-content__cardInfo">
 
-                <!-- Renaming inline input -->
+                <!-- Renaming inline input (grid) -->
                 <ng-container
-                  *ngIf="renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id; else gridNameReadonly"
-                >
+                  *ngIf="renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id; else gridNameReadonly">
                   <div class="upload-content__renameRow">
-                    <input
-                      class="upload-content__renameInlineInput"
-                      [ngModel]="renameDraft()"
-                      (ngModelChange)="renameDraft.set($event)"
-                      (keyup.enter)="saveRename()"
-                      (keyup.escape)="cancelRename()"
-                      placeholder="e.g. wilson2.png"
-                    />
-                    <button
-                      type="button"
-                      class="upload-content__renameSave"
-                      (click)="saveRename()"
-                      [disabled]="!renameDraft() || isUploading()"
-                      aria-label="Save rename"
-                    >
-                      <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <div class="upload-content__renameInputWrap">
+                      <input class="upload-content__renameInlineInput"
+                        [class.upload-content__renameInlineInput--error]="renameValidationError() !== null"
+                        [ngModel]="renameDraft()" (ngModelChange)="onRenameDraftChange($event)"
+                        (keyup.enter)="saveRename()" (keyup.escape)="cancelRename()" placeholder="e.g. my_file"
+                        aria-describedby="rename-error-grid-{{ q.id }}" />
+                      <!-- Floating tooltip error shown above the input -->
+                      <div *ngIf="renameValidationError() !== null" id="rename-error-grid-{{ q.id }}"
+                        class="upload-content__renameTooltip" role="alert" aria-live="polite">
+                        <svg viewBox="0 0 24 24" class="upload-content__renameTooltipIcon" fill="none"
+                          stroke="currentColor" stroke-width="2">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 8v4" />
+                          <path d="M12 16h.01" />
+                        </svg>
+                        <span>{{ renameValidationError() }}</span>
+                        <div class="upload-content__renameTooltipArrow"></div>
+                      </div>
+                    </div>
+                    <button type="button" class="upload-content__renameSave" (click)="saveRename()"
+                      [disabled]="renameSaveDisabled()" aria-label="Save rename">
+                      <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
                         <path d="M20 6 9 17l-5-5" />
                       </svg>
                     </button>
-                    <button
-                      type="button"
-                      class="upload-content__renameCancel"
-                      (click)="cancelRename()"
-                      aria-label="Cancel rename"
-                    >
-                      <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <button type="button" class="upload-content__renameCancel" (click)="cancelRename()"
+                      aria-label="Cancel rename">
+                      <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
                         <path d="M18 6 6 18" />
                         <path d="m6 6 12 12" />
                       </svg>
@@ -312,13 +256,16 @@
                   </div>
                 </ng-container>
 
-                <!-- Read-only filename -->
+                <!-- Read-only filename (grid) -->
                 <ng-template #gridNameReadonly>
                   <div class="upload-content__cardFilenameRow">
                     <div class="upload-content__cardFilename">
                       {{ q.filename }}
                     </div>
-                    <span *ngIf="q.isRenamed" class="upload-content__renamedBadge">
+                    <span *ngIf="q.hasInvalidFilename" class="upload-content__invalidBadge">
+                      Invalid
+                    </span>
+                    <span *ngIf="q.isRenamed && !q.hasInvalidFilename" class="upload-content__renamedBadge">
                       Renamed
                     </span>
                   </div>
@@ -329,16 +276,12 @@
                 </div>
               </div>
 
-              <!-- Rename trigger -->
-              <button
-                *ngIf="!(renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id)"
-                type="button"
-                class="upload-content__iconBtn"
-                (click)="beginRename('queue', q.id)"
-                [disabled]="isUploading()"
-                aria-label="Rename"
-              >
-                <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none" stroke="currentColor" stroke-width="2">
+              <!-- Rename trigger (grid) -->
+              <button *ngIf="!(renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id)" type="button"
+                class="upload-content__iconBtn" (click)="beginRename('queue', q.id)" [disabled]="isUploading()"
+                aria-label="Rename">
+                <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none"
+                  stroke="currentColor" stroke-width="2">
                   <path d="M12 20h9" />
                   <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
                 </svg>
@@ -353,93 +296,89 @@
           </div>
         </div>
 
-        <!-- List view -->
-        <div
-          *ngIf="queue().length > 0 && viewMode() === 'list'"
-          class="upload-content__selectedList"
-        >
-          <div
-            *ngFor="let q of queue()"
-            class="upload-content__fileRow"
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- List view                                                        -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div *ngIf="queue().length > 0 && viewMode() === 'list'" class="upload-content__selectedList">
+          <div *ngFor="let q of queue(); trackBy: trackById" class="upload-content__fileRow"
             [class.upload-content__fileRow--duplicate]="q.isDuplicateTitle"
-          >
+            [class.upload-content__fileRow--invalid]="q.hasInvalidFilename">
             <div class="upload-content__thumbWrapper">
               <div class="upload-content__thumb">
-                <video
-                  *ngIf="q.isVideo"
-                  class="upload-content__thumbAsset"
-                  [src]="q.objectUrl"
-                  muted
-                  playsinline
-                  loop
-                  (mouseenter)="videoEnter(v2)"
-                  (mouseleave)="videoLeave(v2)"
-                  #v2
-                ></video>
+                <video *ngIf="q.isVideo" class="upload-content__thumbAsset" [src]="q.objectUrl" muted playsinline loop
+                  (mouseenter)="videoEnter(v2)" (mouseleave)="videoLeave(v2)" #v2></video>
                 <img *ngIf="!q.isVideo" class="upload-content__thumbAsset" [src]="q.objectUrl" [alt]="q.filename" />
               </div>
             </div>
 
             <div class="upload-content__rowInfo">
               <div class="upload-content__rowNameRow">
+                <!-- Renaming inline input (list) -->
                 <ng-container
-                  *ngIf="renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id; else listNameReadonly"
-                >
-                  <input
-                    class="upload-content__renameInlineInput"
-                    [ngModel]="renameDraft()"
-                    (ngModelChange)="renameDraft.set($event)"
-                    (keyup.enter)="saveRename()"
-                    (keyup.escape)="cancelRename()"
-                    placeholder="e.g. wilson2.png"
-                  />
-                  <button
-                    type="button"
-                    class="upload-content__renameSave"
-                    (click)="saveRename()"
-                    [disabled]="!renameDraft() || isUploading()"
-                    aria-label="Save rename"
-                  >
-                    <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none" stroke="currentColor" stroke-width="2.5">
+                  *ngIf="renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id; else listNameReadonly">
+                  <div class="upload-content__renameInputWrap upload-content__renameInputWrap--list">
+                    <input class="upload-content__renameInlineInput"
+                      [class.upload-content__renameInlineInput--error]="renameValidationError() !== null"
+                      [ngModel]="renameDraft()" (ngModelChange)="onRenameDraftChange($event)"
+                      (keyup.enter)="saveRename()" (keyup.escape)="cancelRename()" placeholder="e.g. my_file"
+                      aria-describedby="rename-error-list-{{ q.id }}" />
+                    <!-- Floating tooltip error shown above the input -->
+                    <div *ngIf="renameValidationError() !== null" id="rename-error-list-{{ q.id }}"
+                      class="upload-content__renameTooltip" role="alert" aria-live="polite">
+                      <svg viewBox="0 0 24 24" class="upload-content__renameTooltipIcon" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 8v4" />
+                        <path d="M12 16h.01" />
+                      </svg>
+                      <span>{{ renameValidationError() }}</span>
+                      <div class="upload-content__renameTooltipArrow"></div>
+                    </div>
+                  </div>
+                  <button type="button" class="upload-content__renameSave" (click)="saveRename()"
+                    [disabled]="renameSaveDisabled()" aria-label="Save rename">
+                    <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
                       <path d="M20 6 9 17l-5-5" />
                     </svg>
                   </button>
-                  <button
-                    type="button"
-                    class="upload-content__renameCancel"
-                    (click)="cancelRename()"
-                    aria-label="Cancel rename"
-                  >
-                    <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <button type="button" class="upload-content__renameCancel" (click)="cancelRename()"
+                    aria-label="Cancel rename">
+                    <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--xs" fill="none"
+                      stroke="currentColor" stroke-width="2.5">
                       <path d="M18 6 6 18" />
                       <path d="m6 6 12 12" />
                     </svg>
                   </button>
                 </ng-container>
+
+                <!-- Read-only filename (list) -->
                 <ng-template #listNameReadonly>
                   <div class="upload-content__rowFilename">
                     {{ q.filename }}
                   </div>
-                  <span *ngIf="q.isDuplicateTitle" class="upload-content__duplicateBadge">
+                  <span *ngIf="q.hasInvalidFilename" class="upload-content__invalidBadge">
+                    Invalid filename — rename to continue
+                  </span>
+                  <span *ngIf="q.isDuplicateTitle && !q.hasInvalidFilename" class="upload-content__duplicateBadge">
                     Duplicate — click to rename
                   </span>
-                  <span *ngIf="q.isRenamed && !q.isDuplicateTitle" class="upload-content__renamedBadge">
+                  <span *ngIf="q.isRenamed && !q.isDuplicateTitle && !q.hasInvalidFilename"
+                    class="upload-content__renamedBadge">
                     Renamed
                   </span>
                 </ng-template>
               </div>
+
               <div class="upload-content__rowMeta">
                 <span class="upload-content__metaChip">{{ q.isVideo ? 'Video' : 'Image' }}</span>
                 <span>{{ formatBytes(q.sizeBytes) }}</span>
               </div>
               <div class="upload-content__rowStatus">
-                <span
-                  class="upload-content__status"
-                  [class.upload-content__status--queued]="q.status === 'queued'"
+                <span class="upload-content__status" [class.upload-content__status--queued]="q.status === 'queued'"
                   [class.upload-content__status--uploading]="q.status === 'uploading'"
                   [class.upload-content__status--uploaded]="q.status === 'uploaded'"
-                  [class.upload-content__status--error]="q.status === 'error'"
-                >
+                  [class.upload-content__status--error]="q.status === 'error'">
                   <ng-container [ngSwitch]="q.status">
                     <span *ngSwitchCase="'queued'">pending</span>
                     <span *ngSwitchCase="'uploading'">uploading</span>
@@ -457,21 +396,19 @@
             </div>
 
             <div class="upload-content__rowActions">
-              <button
-                *ngIf="!(renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id)"
-                type="button"
-                class="upload-content__iconBtn"
-                (click)="beginRename('queue', q.id)"
-                [disabled]="isUploading()"
-                aria-label="Rename"
-              >
-                <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none" stroke="currentColor" stroke-width="2">
+              <button *ngIf="!(renameTarget()?.kind === 'queue' && renameTarget()?.id === q.id)" type="button"
+                class="upload-content__iconBtn" (click)="beginRename('queue', q.id)" [disabled]="isUploading()"
+                aria-label="Rename">
+                <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none"
+                  stroke="currentColor" stroke-width="2">
                   <path d="M12 20h9" />
                   <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
                 </svg>
               </button>
-              <button type="button" class="upload-content__iconBtn" (click)="removeFromQueue(q.id)" [disabled]="q.status === 'uploading'" aria-label="Remove">
-                <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none" stroke="currentColor" stroke-width="2">
+              <button type="button" class="upload-content__iconBtn" (click)="removeFromQueue(q.id)"
+                [disabled]="q.status === 'uploading'" aria-label="Remove">
+                <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--sm" fill="none"
+                  stroke="currentColor" stroke-width="2">
                   <path d="M18 6 6 18" />
                   <path d="m6 6 12 12" />
                 </svg>
@@ -482,61 +419,31 @@
       </div>
 
       <div class="upload-content__footer">
-        <button
-          type="button"
-          class="upload-content__btnClose"
-          (click)="close()"
-        >
+        <button type="button" class="upload-content__btnClose" (click)="close()">
           Close
         </button>
 
-        <button
-          type="button"
-          class="upload-content__btnUpload"
-          [disabled]="uploadDisabled()"
-          (click)="uploadAll()"
-        >
+        <button type="button" class="upload-content__btnUpload" [disabled]="uploadDisabled()" (click)="uploadAll()">
           Upload ({{ queue().length }}) Content
         </button>
       </div>
     </div>
 
-    <div
-      *ngIf="successOpen()"
-      class="upload-content__success"
-    >
+    <div *ngIf="successOpen()" class="upload-content__success">
       <div class="upload-content__successModal">
-        <div class="upload-content__successHeader">
-          <div>
-            <div class="upload-content__successTitle">Success ✅</div>
-            <div class="upload-content__successSubtitle">Upload/s Complete.</div>
-          </div>
-          <button
-            type="button"
-            class="upload-content__close"
-            (click)="dismissSuccess()"
-            aria-label="Close"
-          >
-            <svg viewBox="0 0 24 24" class="upload-content__icon upload-content__icon--md" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
-          </button>
+        <div class="upload-content__successIconWrap">
+          <svg viewBox="0 0 24 24" class="upload-content__successIcon" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
         </div>
 
-        <div class="upload-content__successBanner">
-          Your changes have been saved successfully.
-        </div>
+        <div class="upload-content__successTitle">Success!</div>
+        <div class="upload-content__successSubtitle">Your changes have been saved successfully.</div>
 
-        <div class="upload-content__successActions">
-          <button
-            type="button"
-            class="upload-content__btnUpload"
-            (click)="dismissSuccess()"
-          >
-            Done
-          </button>
-        </div>
+        <button type="button" class="upload-content__successBtn" (click)="dismissSuccess()">
+          Continue
+        </button>
       </div>
     </div>
   </div>
